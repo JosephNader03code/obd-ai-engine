@@ -1,0 +1,362 @@
+{
+  "version": 1,
+  "notes": "Thresholds are typical values for gasoline port/direct injection engines. Tune per vehicle family.",
+  "rules": [
+    {
+      "id": "R_CAT_CONFIRMED",
+      "title_ar": "الكتلايزر لا يخزن الأكسجين: الحساس الخلفي يقلد الأمامي",
+      "title_en": "Catalyst oxygen storage low: downstream O2 mirrors upstream",
+      "hypothesis": "catalyst",
+      "confidence": 0.85,
+      "severity": "medium",
+      "when": {"all": [
+        {"any": [{"dtc": "P0420"}, {"dtc": "P0430"}]},
+        {"feature": "o2_down_std", "op": ">", "value": 0.12},
+        {"feature": "o2_corr", "op": ">", "value": 0.5}
+      ]},
+      "tests": ["T_CAT_TEMP", "T_EXHAUST_LEAK", "T_O2_DOWNSTREAM"],
+      "kb_refs": ["DTC_P0420", "PROC_CATALYST"]
+    },
+    {
+      "id": "R_CAT_DTC_ONLY",
+      "title_ar": "كود P0420 بدون دليل كافي من حساسات الأكسجين",
+      "title_en": "P0420 present but O2 data does not confirm catalyst failure",
+      "hypothesis": "catalyst",
+      "confidence": 0.4,
+      "severity": "low",
+      "when": {"all": [
+        {"any": [{"dtc": "P0420"}, {"dtc": "P0430"}]},
+        {"not": {"feature": "o2_down_std", "op": ">", "value": 0.12}}
+      ]},
+      "tests": ["T_O2_DOWNSTREAM", "T_EXHAUST_LEAK", "T_CAT_TEMP"],
+      "kb_refs": ["DTC_P0420"]
+    },
+    {
+      "id": "R_CAT_SECONDARY_LEAN",
+      "title_ar": "P0420 غالباً نتيجة خلط فقير، صلّح الخلط قبل تغيير الكتلايزر",
+      "title_en": "P0420 likely secondary to a lean condition: fix fuel trim first",
+      "hypothesis": "vacuum_leak",
+      "confidence": 0.75,
+      "severity": "medium",
+      "when": {"all": [
+        {"any": [{"dtc": "P0420"}, {"dtc": "P0430"}]},
+        {"any": [
+          {"feature": "trim_idle", "op": ">", "value": 10},
+          {"feature": "ltft_mean", "op": ">", "value": 8},
+          {"dtc": "P0171"}
+        ]}
+      ]},
+      "suppresses": ["R_CAT_CONFIRMED"],
+      "tests": ["T_SMOKE", "T_EXHAUST_LEAK", "T_TRIM_RPM"],
+      "kb_refs": ["DTC_P0420", "DTC_P0171", "PROC_VACUUM"]
+    },
+    {
+      "id": "R_LEAN_VACUUM",
+      "title_ar": "خلط فقير في الوضع الثابت يتحسن مع اللفات: تسريب هواء غير مقاس",
+      "title_en": "Lean at idle that improves with RPM: unmetered air (vacuum leak)",
+      "hypothesis": "vacuum_leak",
+      "confidence": 0.8,
+      "severity": "medium",
+      "when": {"all": [
+        {"feature": "trim_idle", "op": ">", "value": 10},
+        {"feature": "trim_high", "op": "<", "value": 8}
+      ]},
+      "tests": ["T_SMOKE", "T_TRIM_RPM", "T_PCV"],
+      "kb_refs": ["DTC_P0171", "PROC_VACUUM"]
+    },
+    {
+      "id": "R_LEAN_MAF",
+      "title_ar": "قراءة MAF أقل من المتوقع مع خلط فقير يزيد مع الحمل",
+      "title_en": "MAF under-reads vs. speed-density estimate, lean grows with load",
+      "hypothesis": "maf_dirty",
+      "confidence": 0.75,
+      "severity": "medium",
+      "when": {"all": [
+        {"feature": "maf_ratio", "op": "<", "value": 0.85},
+        {"feature": "trim_high", "op": ">", "value": 10}
+      ]},
+      "tests": ["T_MAF_CHECK", "T_AIR_FILTER", "T_SMOKE"],
+      "kb_refs": ["DTC_P0171", "DTC_P0101", "PROC_MAF"]
+    },
+    {
+      "id": "R_LEAN_FUEL",
+      "title_ar": "خلط فقير تحت الحمل فقط مع MAF سليم: ضعف في إمداد البنزين",
+      "title_en": "Lean only under load with plausible MAF: fuel delivery",
+      "hypothesis": "fuel_delivery",
+      "confidence": 0.7,
+      "severity": "high",
+      "when": {"all": [
+        {"feature": "trim_high", "op": ">", "value": 12},
+        {"feature": "trim_idle", "op": "<", "value": 8},
+        {"feature": "maf_ratio", "op": "between", "value": [0.88, 1.15]}
+      ]},
+      "tests": ["T_FUEL_PRESSURE", "T_FUEL_VOLUME", "T_INJECTOR"],
+      "kb_refs": ["DTC_P0171", "PROC_FUEL"]
+    },
+    {
+      "id": "R_RICH",
+      "title_ar": "خلط غني: ECU بيقلل البنزين بشكل كبير",
+      "title_en": "Rich condition: ECU pulling fuel",
+      "hypothesis": "rich",
+      "confidence": 0.65,
+      "severity": "medium",
+      "when": {"any": [
+        {"feature": "trim_idle", "op": "<", "value": -10},
+        {"feature": "ltft_mean", "op": "<", "value": -10},
+        {"dtc": "P0172"}
+      ]},
+      "tests": ["T_FUEL_PRESSURE", "T_INJECTOR", "T_EVAP_PURGE"],
+      "kb_refs": ["DTC_P0172"]
+    },
+    {
+      "id": "R_O2_SLOW",
+      "title_ar": "حساس الأكسجين الأمامي بطيء الاستجابة",
+      "title_en": "Upstream O2 sensor slow response",
+      "hypothesis": "o2_slow",
+      "confidence": 0.7,
+      "severity": "low",
+      "when": {"all": [
+        {"feature": "o2_up_switch_rate", "op": "<", "value": 40},
+        {"feature": "o2_up_range", "op": "<", "value": 0.5},
+        {"feature": "ect_max", "op": ">", "value": 75}
+      ]},
+      "tests": ["T_O2_UPSTREAM", "T_EXHAUST_LEAK"],
+      "kb_refs": ["DTC_P0133", "PROC_O2"]
+    },
+    {
+      "id": "R_O2_DOWN_DEAD",
+      "title_ar": "حساس الأكسجين الخلفي ثابت/ميت",
+      "title_en": "Downstream O2 sensor flat / inactive",
+      "hypothesis": "o2_slow",
+      "confidence": 0.6,
+      "severity": "low",
+      "when": {"all": [
+        {"feature": "o2_down_std", "op": "<", "value": 0.005},
+        {"feature": "o2_down_mean", "op": "<", "value": 0.15}
+      ]},
+      "tests": ["T_O2_DOWNSTREAM"],
+      "kb_refs": ["DTC_P0136", "PROC_O2"]
+    },
+    {
+      "id": "R_MISFIRE",
+      "title_ar": "تقطيع في الاحتراق (Misfire)",
+      "title_en": "Engine misfire",
+      "hypothesis": "misfire",
+      "confidence": 0.8,
+      "severity": "high",
+      "when": {"any": [
+        {"dtc_prefix": "P030"},
+        {"feature": "rpm_idle_std", "op": ">", "value": 30}
+      ]},
+      "tests": ["T_COIL_SWAP", "T_SPARK_PLUG", "T_COMPRESSION", "T_INJECTOR"],
+      "kb_refs": ["DTC_P0300", "PROC_MISFIRE"]
+    },
+    {
+      "id": "R_THERMOSTAT",
+      "title_ar": "المحرك لا يصل لحرارة التشغيل: ثرموستات مفتوح",
+      "title_en": "Engine does not reach operating temperature: thermostat",
+      "hypothesis": "thermostat",
+      "confidence": 0.8,
+      "severity": "low",
+      "when": {"any": [
+        {"dtc": "P0128"},
+        {"all": [{"feature": "ect_max", "op": "<", "value": 75}, {"feature": "ect_max", "op": ">", "value": 40}]}
+      ]},
+      "tests": ["T_THERMOSTAT", "T_ECT_SENSOR"],
+      "kb_refs": ["DTC_P0128", "PROC_COOLING"]
+    },
+    {
+      "id": "R_CHARGING",
+      "title_ar": "جهد الشحن منخفض والمحرك دائر",
+      "title_en": "Low charging voltage with engine running",
+      "hypothesis": "charging",
+      "confidence": 0.85,
+      "severity": "high",
+      "when": {"any": [
+        {"feature": "voltage_running", "op": "<", "value": 13.0},
+        {"dtc": "P0562"}
+      ]},
+      "tests": ["T_CHARGING", "T_BATTERY"],
+      "kb_refs": ["DTC_P0562", "PROC_CHARGING"]
+    },
+    {
+      "id": "R_OVERCHARGE",
+      "title_ar": "جهد الشحن مرتفع جداً",
+      "title_en": "Charging voltage too high",
+      "hypothesis": "charging",
+      "confidence": 0.8,
+      "severity": "high",
+      "when": {"any": [{"feature": "voltage_running", "op": ">", "value": 15.0}, {"dtc": "P0563"}]},
+      "tests": ["T_CHARGING"],
+      "kb_refs": ["PROC_CHARGING"]
+    },
+    {
+      "id": "R_OVERHEAT",
+      "title_ar": "المحرك بيسخن فوق الطبيعي: مشكلة في دورة التبريد",
+      "title_en": "Engine overheating: cooling system fault",
+      "hypothesis": "overheating",
+      "confidence": 0.85,
+      "severity": "critical",
+      "when": {"all": [
+        {"feature": "ect_max", "op": ">", "value": 105},
+        {"feature": "ect_rate", "op": ">", "value": 2.0}
+      ]},
+      "tests": ["T_COOLANT_LEVEL", "T_COOLING_SYSTEM", "T_THERMOSTAT", "T_ECT_SENSOR"],
+      "kb_refs": ["PROC_OVERHEAT"]
+    },
+    {
+      "id": "R_OVERHEAT_DTC",
+      "title_ar": "حرارة المحرك مرتفعة بناءً على كود العطل",
+      "title_en": "Engine overheating indicated by DTC",
+      "hypothesis": "overheating",
+      "confidence": 0.7,
+      "severity": "critical",
+      "when": {"any": [
+        {"dtc": "P0217"},
+        {"dtc": "P0118"}
+      ]},
+      "tests": ["T_ECT_SENSOR", "T_COOLANT_LEVEL", "T_COOLING_SYSTEM"],
+      "kb_refs": ["DTC_P0118", "PROC_OVERHEAT"]
+    },
+    {
+      "id": "R_EGR_FLOW",
+      "title_ar": "تدفق EGR غير كافي: الصمام مسدود أو معطل",
+      "title_en": "EGR insufficient flow: valve stuck closed or clogged",
+      "hypothesis": "egr_fault",
+      "confidence": 0.75,
+      "severity": "medium",
+      "when": {"dtc": "P0401"},
+      "tests": ["T_EGR_VALVE", "T_SENSOR_WIRING"],
+      "kb_refs": ["DTC_P0401", "PROC_EGR"]
+    },
+    {
+      "id": "R_EVAP_LARGE",
+      "title_ar": "تسريب كبير في نظام EVAP: غالباً غطا التانك أو خرطوم مفصول",
+      "title_en": "Large EVAP leak: likely gas cap or disconnected hose",
+      "hypothesis": "evap_leak",
+      "confidence": 0.8,
+      "severity": "low",
+      "when": {"dtc": "P0455"},
+      "tests": ["T_GAS_CAP", "T_EVAP_SMOKE", "T_EVAP_PURGE"],
+      "kb_refs": ["DTC_P0455", "PROC_EVAP"]
+    },
+    {
+      "id": "R_EVAP_SMALL",
+      "title_ar": "تسريب صغير في نظام EVAP",
+      "title_en": "Small EVAP leak detected",
+      "hypothesis": "evap_leak",
+      "confidence": 0.65,
+      "severity": "low",
+      "when": {"dtc": "P0442"},
+      "tests": ["T_GAS_CAP", "T_EVAP_SMOKE"],
+      "kb_refs": ["DTC_P0442", "PROC_EVAP"]
+    },
+    {
+      "id": "R_IAT_HIGH",
+      "title_ar": "دائرة حساس حرارة الهواء: قراءة عالية غير منطقية",
+      "title_en": "IAT circuit high: implausible reading indicates wiring fault",
+      "hypothesis": "sensor_circuit",
+      "confidence": 0.8,
+      "severity": "medium",
+      "when": {"all": [
+        {"dtc": "P0113"},
+        {"feature": "iat_value", "op": ">", "value": 70}
+      ]},
+      "tests": ["T_SENSOR_WIRING"],
+      "kb_refs": ["DTC_P0113", "PROC_SENSOR_CIRCUIT"]
+    },
+    {
+      "id": "R_IAT_HIGH_DTC_ONLY",
+      "title_ar": "كود P0113 بدون قراءة حرارة غير منطقية",
+      "title_en": "P0113 present but IAT reading is plausible",
+      "hypothesis": "sensor_circuit",
+      "confidence": 0.5,
+      "severity": "low",
+      "when": {"all": [
+        {"dtc": "P0113"},
+        {"not": {"feature": "iat_value", "op": ">", "value": 70}}
+      ]},
+      "tests": ["T_SENSOR_WIRING"],
+      "kb_refs": ["DTC_P0113", "PROC_SENSOR_CIRCUIT"]
+    },
+    {
+      "id": "R_ECT_HIGH",
+      "title_ar": "دائرة حساس حرارة المياه: قراءة مرتفعة بشكل غير طبيعي",
+      "title_en": "ECT circuit high: sensor or wiring fault",
+      "hypothesis": "sensor_circuit",
+      "confidence": 0.75,
+      "severity": "medium",
+      "when": {"dtc": "P0118"},
+      "suppresses": ["R_OVERHEAT"],
+      "tests": ["T_ECT_SENSOR", "T_SENSOR_WIRING"],
+      "kb_refs": ["DTC_P0118", "PROC_SENSOR_CIRCUIT"]
+    },
+    {
+      "id": "R_CKP_FAULT",
+      "title_ar": "عطل حساس عمود الكرنك: المحرك ممكن يفصل أو ميدورش",
+      "title_en": "Crankshaft position sensor fault: engine may stall or not start",
+      "hypothesis": "sensor_circuit",
+      "confidence": 0.85,
+      "severity": "high",
+      "when": {"dtc": "P0335"},
+      "tests": ["T_CKP_SIGNAL", "T_SENSOR_WIRING"],
+      "kb_refs": ["DTC_P0335", "PROC_SENSOR_CIRCUIT"]
+    },
+    {
+      "id": "R_CMP_FAULT",
+      "title_ar": "عطل حساس عمود الكامة",
+      "title_en": "Camshaft position sensor fault",
+      "hypothesis": "sensor_circuit",
+      "confidence": 0.75,
+      "severity": "medium",
+      "when": {"dtc": "P0340"},
+      "tests": ["T_CMP_SIGNAL", "T_SENSOR_WIRING"],
+      "kb_refs": ["DTC_P0340", "PROC_SENSOR_CIRCUIT"]
+    },
+    {
+      "id": "R_SPEED_SENSOR",
+      "title_ar": "عطل حساس السرعة: العداد مش شغال أو الجير بيعمل مشاكل",
+      "title_en": "Vehicle speed sensor fault: speedometer and transmission issues",
+      "hypothesis": "speed_sensor",
+      "confidence": 0.8,
+      "severity": "high",
+      "when": {"any": [
+        {"dtc": "P0500"},
+        {"feature": "speed_zero_pct", "op": ">", "value": 50}
+      ]},
+      "tests": ["T_VSS_SIGNAL", "T_SENSOR_WIRING"],
+      "kb_refs": ["DTC_P0500", "PROC_SENSOR_CIRCUIT"]
+    },
+    {
+      "id": "R_IDLE_HIGH",
+      "title_ar": "لفات الثبات مرتفعة أو غير مستقرة",
+      "title_en": "Idle RPM high or unstable: idle control malfunction",
+      "hypothesis": "idle_fault",
+      "confidence": 0.7,
+      "severity": "medium",
+      "when": {"any": [
+        {"dtc": "P0505"},
+        {"all": [
+          {"feature": "rpm_idle_mean", "op": ">", "value": 950},
+          {"feature": "rpm_idle_std", "op": ">", "value": 25}
+        ]}
+      ]},
+      "tests": ["T_IAC_VALVE", "T_SMOKE", "T_SENSOR_WIRING"],
+      "kb_refs": ["DTC_P0505", "PROC_IDLE"]
+    },
+    {
+      "id": "R_IDLE_LOW",
+      "title_ar": "لفات الثبات منخفضة جداً: خطر إن المحرك يفصل",
+      "title_en": "Idle RPM too low: risk of stalling",
+      "hypothesis": "idle_fault",
+      "confidence": 0.65,
+      "severity": "medium",
+      "when": {"all": [
+        {"feature": "rpm_idle_mean", "op": "<", "value": 600},
+        {"feature": "rpm_idle_mean", "op": ">", "value": 100}
+      ]},
+      "tests": ["T_IAC_VALVE", "T_SMOKE"],
+      "kb_refs": ["DTC_P0505", "PROC_IDLE"]
+    }
+  ]
+}

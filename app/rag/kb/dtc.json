@@ -1,0 +1,197 @@
+[
+  {
+    "id": "DTC_P0420", "type": "dtc", "code": "P0420",
+    "title_en": "Catalyst System Efficiency Below Threshold (Bank 1)",
+    "title_ar": "كفاءة نظام الكتلايزر أقل من الحد (بنك 1)",
+    "set_conditions_en": "ECU compares upstream (B1S1) and downstream (B1S2) oxygen sensor activity after warm-up, steady cruise 40-90 km/h, closed loop, no misfire or fuel trim faults. If the downstream sensor switches almost as often as the upstream sensor for two consecutive drive cycles the oxygen storage capacity is judged too low.",
+    "set_conditions_ar": "الـ ECU يقارن نشاط حساس الأكسجين الأمامي والخلفي بعد ما المحرك يسخن، في سير ثابت 40-90 كم/س، في closed loop، ومفيش أكواد تقطيع أو خلط. لو الحساس الخلفي بيبدّل تقريباً زي الأمامي لمدة دورتين قيادة، بيعتبر قدرة الكتلايزر على تخزين الأكسجين ضعيفة.",
+    "text_en": "P0420 catalytic converter efficiency low. Healthy catalyst: downstream O2 steady 0.6-0.75 V with low variation. Failing catalyst: downstream O2 mirrors upstream switching. Common causes: worn catalyst, exhaust leak before or near downstream O2 sensor, lean or rich running, misfire damage, oil or coolant consumption poisoning the catalyst, faulty downstream O2 sensor, ECU software update available. Do not replace catalyst before fixing misfires and fuel trim problems.",
+    "causes_ar": ["كتلايزر مستهلك أو مسدود جزئياً", "تسريب في الشكمان قبل أو جنب الحساس الخلفي", "خلط فقير أو غني مستمر (تصحيح وقود عالي)", "تقطيع سابق أتلف الكتلايزر", "استهلاك زيت أو مياه بيسمم الكتلايزر", "حساس الأكسجين الخلفي نفسه بايظ", "تحديث برمجة للـ ECU متاح من الوكيل"],
+    "related_pids": ["o2_up", "o2_down", "stft", "ltft", "ect"],
+    "tests": ["T_O2_DOWNSTREAM", "T_EXHAUST_LEAK", "T_CAT_TEMP", "T_TRIM_RPM"],
+    "severity": "medium"
+  },
+  {
+    "id": "DTC_P0430", "type": "dtc", "code": "P0430",
+    "title_en": "Catalyst System Efficiency Below Threshold (Bank 2)",
+    "title_ar": "كفاءة الكتلايزر أقل من الحد (بنك 2)",
+    "set_conditions_en": "Same monitor as P0420 for bank 2 sensors B2S1/B2S2.",
+    "set_conditions_ar": "نفس منطق P0420 لكن لبنك 2 (المحركات V6/V8).",
+    "text_en": "P0430 catalyst efficiency bank 2. Same logic and causes as P0420 for the second bank: worn catalyst, exhaust leak, downstream sensor, fuel trim issues on bank 2.",
+    "causes_ar": ["كتلايزر بنك 2 مستهلك", "تسريب عادم بنك 2", "حساس B2S2 بايظ"],
+    "related_pids": ["o2_down"], "tests": ["T_O2_DOWNSTREAM", "T_EXHAUST_LEAK", "T_CAT_TEMP"], "severity": "medium"
+  },
+  {
+    "id": "DTC_P0171", "type": "dtc", "code": "P0171",
+    "title_en": "System Too Lean (Bank 1)",
+    "title_ar": "الخلط فقير جداً (بنك 1)",
+    "set_conditions_en": "Total fuel trim (STFT + LTFT) exceeds about +25% (manufacturer specific) for a period while in closed loop, usually at idle or cruise.",
+    "set_conditions_ar": "مجموع التصحيح (STFT + LTFT) يعدي حوالي +25% (حسب المصنع) لفترة وهو في closed loop، غالباً في الوضع الثابت أو السير.",
+    "text_en": "P0171 lean condition bank 1. Diagnose by comparing fuel trim at idle versus 2500 rpm. Lean at idle that improves at higher rpm indicates vacuum leak (unmetered air): intake gasket, PCV hose, brake booster hose, throttle body gasket. Lean that increases with load indicates fuel delivery (weak fuel pump, clogged filter, pressure regulator) or under-reading MAF sensor. Compare MAF reading against expected airflow. Exhaust leak before upstream O2 can also look lean.",
+    "causes_ar": ["تسريب هواء (خراطيم فاكيوم، جوان المنفولد، PCV، خرطوم سيرفو الفرامل)", "حساس MAF متسخ أو بيقرأ أقل", "طلمبة بنزين ضعيفة أو فلتر مسدود أو منظم ضغط بايظ", "بخاخات مسدودة", "تسريب عادم قبل الحساس الأمامي"],
+    "related_pids": ["stft", "ltft", "maf", "map", "rpm", "o2_up"],
+    "tests": ["T_TRIM_RPM", "T_SMOKE", "T_MAF_CHECK", "T_FUEL_PRESSURE"],
+    "severity": "medium"
+  },
+  {
+    "id": "DTC_P0174", "type": "dtc", "code": "P0174",
+    "title_en": "System Too Lean (Bank 2)", "title_ar": "الخلط فقير جداً (بنك 2)",
+    "set_conditions_en": "Same as P0171 for bank 2.", "set_conditions_ar": "نفس P0171 لبنك 2.",
+    "text_en": "P0174 lean bank 2. If both P0171 and P0174 are present the cause is common to both banks: MAF sensor, fuel pressure, or a large central vacuum leak.",
+    "causes_ar": ["لو مع P0171: السبب مشترك (MAF أو ضغط بنزين أو تسريب كبير)"],
+    "related_pids": ["stft", "ltft", "maf"], "tests": ["T_TRIM_RPM", "T_SMOKE", "T_MAF_CHECK", "T_FUEL_PRESSURE"], "severity": "medium"
+  },
+  {
+    "id": "DTC_P0172", "type": "dtc", "code": "P0172",
+    "title_en": "System Too Rich (Bank 1)", "title_ar": "الخلط غني جداً (بنك 1)",
+    "set_conditions_en": "Total fuel trim below about -25% in closed loop.", "set_conditions_ar": "مجموع التصحيح أقل من حوالي -25%.",
+    "text_en": "P0172 rich condition. Causes: leaking injector, high fuel pressure or faulty regulator, stuck open EVAP purge valve, MAF over-reading, oil diluted with fuel, coolant temperature sensor reading cold.",
+    "causes_ar": ["بخاخ بيسرّب", "ضغط بنزين عالي", "صمام البيرج (EVAP) مفتوح", "حساس حرارة بيقرأ بارد", "MAF بيقرأ أعلى"],
+    "related_pids": ["stft", "ltft", "ect"], "tests": ["T_FUEL_PRESSURE", "T_INJECTOR", "T_EVAP_PURGE"], "severity": "medium"
+  },
+  {
+    "id": "DTC_P0101", "type": "dtc", "code": "P0101",
+    "title_en": "Mass Air Flow Circuit Range/Performance",
+    "title_ar": "أداء/مدى دائرة حساس كمية الهواء MAF",
+    "set_conditions_en": "MAF reading is not plausible compared with value calculated from RPM, throttle position and MAP (speed-density model).",
+    "set_conditions_ar": "قراءة الـ MAF مش منطقية مقارنة بالقيمة المحسوبة من اللفات والبدال والـ MAP.",
+    "text_en": "P0101 MAF performance. Contaminated hot-wire, air leak after the MAF, clogged air filter, wiring or connector issue, wrong aftermarket intake. MAF at idle is roughly 2-4 g/s per litre... compare measured g/s to expected g/s; ratio well below 1 means under-reading.",
+    "causes_ar": ["حساس MAF متسخ", "تسريب هواء بعد الحساس", "فلتر هواء مسدود", "مشكلة في الفيشة أو السلك"],
+    "related_pids": ["maf", "map", "rpm", "tps"], "tests": ["T_MAF_CHECK", "T_AIR_FILTER", "T_SMOKE"], "severity": "medium"
+  },
+  {
+    "id": "DTC_P0133", "type": "dtc", "code": "P0133",
+    "title_en": "O2 Sensor Circuit Slow Response (Bank 1 Sensor 1)",
+    "title_ar": "استجابة بطيئة لحساس الأكسجين (بنك 1 حساس 1)",
+    "set_conditions_en": "Upstream O2 lean-to-rich and rich-to-lean switch time or switching frequency outside limits during steady closed-loop operation.",
+    "set_conditions_ar": "زمن تبديل حساس الأكسجين الأمامي بين فقير وغني أبطأ من المسموح في سير ثابت.",
+    "text_en": "P0133 slow upstream oxygen sensor. Aged or contaminated sensor (silicone, oil, coolant), exhaust leak near sensor, heater circuit weak, wiring. Healthy narrow-band sensor at 2500 rpm switches between 0.1 and 0.9 V several times per second.",
+    "causes_ar": ["حساس أكسجين قديم أو متسمم (زيت/مياه/سيليكون)", "تسريب عادم جنب الحساس", "سخان الحساس ضعيف", "مشكلة أسلاك"],
+    "related_pids": ["o2_up"], "tests": ["T_O2_UPSTREAM", "T_EXHAUST_LEAK"], "severity": "low"
+  },
+  {
+    "id": "DTC_P0136", "type": "dtc", "code": "P0136",
+    "title_en": "O2 Sensor Circuit Malfunction (Bank 1 Sensor 2)",
+    "title_ar": "عطل دائرة حساس الأكسجين الخلفي (بنك 1 حساس 2)",
+    "set_conditions_en": "Downstream sensor voltage stuck or out of range.", "set_conditions_ar": "جهد الحساس الخلفي ثابت أو خارج المدى.",
+    "text_en": "P0136 downstream O2 sensor circuit. Sensor stuck low near 0.1 V or no activity, wiring short, connector corrosion.",
+    "causes_ar": ["الحساس الخلفي ميت", "قصر في الأسلاك", "صدأ في الفيشة"],
+    "related_pids": ["o2_down"], "tests": ["T_O2_DOWNSTREAM"], "severity": "low"
+  },
+  {
+    "id": "DTC_P0300", "type": "dtc", "code": "P0300",
+    "title_en": "Random/Multiple Cylinder Misfire Detected (P0301-P0306 = specific cylinder)",
+    "title_ar": "تقطيع عشوائي/في أكثر من سلندر (P0301-P0306 = سلندر محدد)",
+    "set_conditions_en": "Crankshaft speed fluctuation analysis detects misfire rate above emission or catalyst-damage threshold. A flashing MIL means catalyst-damaging misfire.",
+    "set_conditions_ar": "الـ ECU بيقيس تذبذب سرعة الكرنك، ولو نسبة التقطيع عدّت الحد بيسجل الكود. لمبة المحرك بتفلش = تقطيع ممكن يتلف الكتلايزر.",
+    "text_en": "P0300 P0301 P0302 P0303 P0304 misfire. Causes: worn spark plug, failed ignition coil, injector fault, low compression (valves, rings, head gasket), vacuum leak at one runner, low fuel pressure. Diagnose by swapping coil to another cylinder and checking if the misfire code follows. RPM fluctuation at idle supports misfire. Stop driving under load if MIL flashes.",
+    "causes_ar": ["بوجيه مستهلكة", "موبينة (كويل) بايظة", "بخاخ مش شغال", "ضغط سلندر ضعيف (بلوف، شنابر، جوان وش)", "تسريب هواء عند سلندر واحد"],
+    "related_pids": ["rpm", "stft", "timing"], "tests": ["T_COIL_SWAP", "T_SPARK_PLUG", "T_COMPRESSION", "T_INJECTOR"], "severity": "high"
+  },
+  {
+    "id": "DTC_P0128", "type": "dtc", "code": "P0128",
+    "title_en": "Coolant Thermostat (Coolant Temperature Below Thermostat Regulating Temperature)",
+    "title_ar": "حرارة المياه أقل من حرارة فتح الثرموستات",
+    "set_conditions_en": "Engine coolant does not reach the expected temperature (often 70-80°C) within a calculated time based on air flow and ambient temperature.",
+    "set_conditions_ar": "حرارة المياه مش بتوصل للقيمة المتوقعة (غالباً 70-80°C) في الوقت المحسوب حسب كمية الهواء وحرارة الجو.",
+    "text_en": "P0128 thermostat stuck open or coolant temperature sensor reading low. Low heater output, higher fuel consumption. Verify ECT with infrared thermometer at thermostat housing; check radiator hose warming; cooling fan running continuously.",
+    "causes_ar": ["ثرموستات مفتوح باستمرار", "حساس حرارة المياه (ECT) بيقرأ أقل", "مروحة الردياتير شغالة على طول", "مستوى المياه قليل"],
+    "related_pids": ["ect"], "tests": ["T_THERMOSTAT", "T_ECT_SENSOR"], "severity": "low"
+  },
+  {
+    "id": "DTC_P0562", "type": "dtc", "code": "P0562",
+    "title_en": "System Voltage Low", "title_ar": "جهد النظام منخفض",
+    "set_conditions_en": "Module supply voltage below about 10-11.5 V for a period with engine running.",
+    "set_conditions_ar": "جهد تغذية الكمبيوتر أقل من 10-11.5 فولت لفترة والمحرك دائر.",
+    "text_en": "P0562 low system voltage. Alternator not charging, worn belt, bad alternator connector or ground, weak battery, high resistance at battery terminals. Normal charging 13.5-14.7 V at idle.",
+    "causes_ar": ["الدينامو مش بيشحن", "سير مرتخي أو مقطوع", "أرضي أو فيشة الدينامو", "بطارية ضعيفة", "أقطاب البطارية مصدية"],
+    "related_pids": ["voltage"], "tests": ["T_CHARGING", "T_BATTERY"], "severity": "high"
+  },
+  {
+    "id": "DTC_P0563", "type": "dtc", "code": "P0563",
+    "title_en": "System Voltage High", "title_ar": "جهد النظام مرتفع",
+    "set_conditions_en": "Supply voltage above about 15.5-16 V.", "set_conditions_ar": "الجهد أعلى من 15.5-16 فولت.",
+    "text_en": "P0563 overcharging. Failed voltage regulator in alternator, bad sense wire.",
+    "causes_ar": ["منظم الدينامو بايظ", "سلك الإحساس"], "related_pids": ["voltage"], "tests": ["T_CHARGING"], "severity": "high"
+  },
+  {
+    "id": "DTC_P0113", "type": "dtc", "code": "P0113",
+    "title_en": "Intake Air Temperature Sensor Circuit High", "title_ar": "دائرة حساس حرارة الهواء: جهد عالي",
+    "set_conditions_en": "IAT signal near reference voltage (reads very cold, e.g. -40°C).", "set_conditions_ar": "الحساس بيقرأ بارد جداً (-40) = دائرة مفتوحة.",
+    "text_en": "P0113 IAT open circuit, disconnected connector, broken wire. IAT reading -40°C indicates open.",
+    "causes_ar": ["فيشة مفصولة", "سلك مقطوع", "حساس بايظ"], "related_pids": ["iat"], "tests": ["T_SENSOR_WIRING"], "severity": "low"
+  },
+  {
+    "id": "DTC_P0118", "type": "dtc", "code": "P0118",
+    "title_en": "Engine Coolant Temperature Circuit High", "title_ar": "دائرة حساس حرارة المياه: جهد عالي",
+    "set_conditions_en": "ECT signal open circuit, reads -40°C.", "set_conditions_ar": "دائرة مفتوحة، الحساس بيقرأ -40.",
+    "text_en": "P0118 ECT open circuit; cooling fan may run constantly as failsafe. Check connector and wiring.",
+    "causes_ar": ["فيشة الحساس", "سلك مقطوع", "حساس بايظ"], "related_pids": ["ect"], "tests": ["T_SENSOR_WIRING", "T_ECT_SENSOR"], "severity": "medium"
+  },
+  {
+    "id": "DTC_P0335", "type": "dtc", "code": "P0335",
+    "title_en": "Crankshaft Position Sensor A Circuit", "title_ar": "دائرة حساس وضع الكرنك",
+    "set_conditions_en": "No crank signal while cam signal present, or erratic signal.", "set_conditions_ar": "مفيش إشارة كرنك أو إشارة متقطعة.",
+    "text_en": "P0335 crankshaft position sensor. Engine cranks no start or stalls when hot. Damaged reluctor ring, sensor gap, wiring.",
+    "causes_ar": ["حساس الكرنك", "ترس الحساس تالف", "أسلاك"], "related_pids": ["rpm"], "tests": ["T_SENSOR_WIRING"], "severity": "high"
+  },
+  {
+    "id": "DTC_P0340", "type": "dtc", "code": "P0340",
+    "title_en": "Camshaft Position Sensor A Circuit (Bank 1)", "title_ar": "دائرة حساس وضع الكامة",
+    "set_conditions_en": "Cam signal missing or not synchronized with crank.", "set_conditions_ar": "إشارة الكامة مش موجودة أو مش متزامنة مع الكرنك.",
+    "text_en": "P0340 camshaft position sensor, timing chain or belt stretched or jumped tooth, wiring.",
+    "causes_ar": ["حساس الكامة", "جنزير/سير الكاتينة مرتخي أو نط سنة", "أسلاك"], "related_pids": ["rpm"], "tests": ["T_SENSOR_WIRING"], "severity": "high"
+  },
+  {
+    "id": "DTC_P0401", "type": "dtc", "code": "P0401",
+    "title_en": "Exhaust Gas Recirculation Flow Insufficient", "title_ar": "تدفق EGR غير كافي",
+    "set_conditions_en": "Commanding EGR does not produce expected MAP rise / temperature change.", "set_conditions_ar": "فتح الـ EGR مش بيغير الـ MAP زي المتوقع.",
+    "text_en": "P0401 EGR insufficient flow: carbon clogged EGR passages or valve, failed EGR solenoid, vacuum line.",
+    "causes_ar": ["كربون في مجاري الـ EGR", "صمام EGR", "خرطوم فاكيوم"], "related_pids": ["map"], "tests": ["T_SMOKE"], "severity": "low"
+  },
+  {
+    "id": "DTC_P0442", "type": "dtc", "code": "P0442",
+    "title_en": "EVAP System Small Leak Detected", "title_ar": "تسريب صغير في نظام EVAP",
+    "set_conditions_en": "EVAP leak test detects leak about 1 mm (0.040 in).", "set_conditions_ar": "اختبار EVAP اكتشف تسريب حوالي 1 مم.",
+    "text_en": "P0442 small evap leak: fuel cap seal, purge or vent valve, cracked hose. Not an engine performance fault.",
+    "causes_ar": ["غطا تانك البنزين", "صمام purge/vent", "خرطوم مشروخ"], "related_pids": [], "tests": ["T_EVAP_PURGE", "T_SMOKE"], "severity": "low"
+  },
+  {
+    "id": "DTC_P0455", "type": "dtc", "code": "P0455",
+    "title_en": "EVAP System Large Leak Detected", "title_ar": "تسريب كبير في نظام EVAP",
+    "set_conditions_en": "EVAP system cannot hold vacuum.", "set_conditions_ar": "النظام مش قادر يمسك فاكيوم.",
+    "text_en": "P0455 large evap leak: missing or loose fuel cap, disconnected hose, vent valve stuck open.",
+    "causes_ar": ["غطا التانك مفتوح أو ناقص", "خرطوم مفصول"], "related_pids": [], "tests": ["T_EVAP_PURGE", "T_SMOKE"], "severity": "low"
+  },
+  {
+    "id": "DTC_P0500", "type": "dtc", "code": "P0500",
+    "title_en": "Vehicle Speed Sensor A", "title_ar": "حساس سرعة السيارة",
+    "set_conditions_en": "No speed signal while engine load indicates driving.", "set_conditions_ar": "مفيش إشارة سرعة والعربية ماشية.",
+    "text_en": "P0500 vehicle speed sensor, ABS wheel speed source, wiring. Speedometer may not work, transmission shifting erratic.",
+    "causes_ar": ["حساس السرعة", "حساس ABS", "أسلاك"], "related_pids": ["speed"], "tests": ["T_SENSOR_WIRING"], "severity": "medium"
+  },
+  {
+    "id": "DTC_P0505", "type": "dtc", "code": "P0505",
+    "title_en": "Idle Air Control System", "title_ar": "نظام التحكم في هواء الوضع الثابت",
+    "set_conditions_en": "Actual idle rpm differs from target.", "set_conditions_ar": "اللفات الفعلية مختلفة عن المطلوبة.",
+    "text_en": "P0505 idle control: dirty throttle body, IAC valve, vacuum leak, needs idle relearn.",
+    "causes_ar": ["بوابة البنزين متسخة", "صمام IAC", "تسريب هواء", "محتاج idle relearn"], "related_pids": ["rpm", "tps"], "tests": ["T_SMOKE"], "severity": "low"
+  },
+  {
+    "id": "DTC_P0700", "type": "dtc", "code": "P0700",
+    "title_en": "Transmission Control System Malfunction", "title_ar": "عطل في نظام التحكم في الفتيس",
+    "set_conditions_en": "TCM has stored a fault; read TCM codes for detail.", "set_conditions_ar": "كمبيوتر الفتيس مسجل عطل، لازم تقرأ أكواد الـ TCM.",
+    "text_en": "P0700 transmission control module requests MIL. Read transmission-specific codes with a scanner that supports the TCM.",
+    "causes_ar": ["عطل مسجل في الـ TCM"], "related_pids": [], "tests": [], "severity": "medium"
+  },
+  {
+    "id": "DTC_P0217", "type": "dtc", "code": "P0217",
+    "title_en": "Engine Coolant Over Temperature Condition",
+    "title_ar": "حرارة مياه التبريد مرتفعة فوق الحد",
+    "text_en": "P0217 is set when the ECU detects that engine coolant temperature has exceeded the maximum allowable threshold (typically above 115°C). This may indicate a cooling system failure such as a stuck-closed thermostat, failed water pump, low coolant level, blocked radiator, or failed cooling fan. Continued driving risks severe engine damage including warped cylinder head and blown head gasket.",
+    "text_ar": "P0217 بيتسجل لما حرارة المياه تعدي الحد الأقصى (عادة فوق 115°C). ده ممكن يكون بسبب ثرموستات مقفول، طلمبة مياه باظت، مستوى مياه ناقص، ردياتير مسدود، أو مروحة واقفة. لو فضلت ماشي ممكن يحصل أضرار خطيرة زي لطش وش السلندر أو جوان الوش.",
+    "causes_en": ["Thermostat stuck closed", "Water pump failure", "Low coolant level", "Blocked radiator", "Cooling fan failure", "Head gasket leak"],
+    "causes_ar": ["ثرموستات مقفول", "طلمبة مياه باظت", "مياه ناقصة", "ردياتير مسدود", "مروحة واقفة", "تسريب جوان وش"],
+    "related_pids": ["ect"], "tests": ["T_COOLANT_LEVEL", "T_COOLING_SYSTEM", "T_THERMOSTAT"], "severity": "critical"
+  }
+]
